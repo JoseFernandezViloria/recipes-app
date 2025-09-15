@@ -1,4 +1,4 @@
-const mongoose = "mongoose";
+const mongoose = require("mongoose");
 
 const recipeSchema = new mongoose.Schema({
   mealId: { type: String, required: true }, // ID de TheMealDB

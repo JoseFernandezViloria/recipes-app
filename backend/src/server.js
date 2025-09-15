@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const morgan = require("morgan");
 
-const recipesRoutes = require(".src/routes/recipes.routes");
+const recipesRoutes = require("./routes/recipes.routes");
 
 const app = express();
 
@@ -19,17 +19,31 @@ app.get("/", (req, res) => {
   res.send("🍲 API de recetas funcionando 🚀");
 });
 
-app.use("/api/recipes, recipesRoutes");
+app.use("/api/recipes", recipesRoutes);
 
 // Conexion a Mongo y arranque del servidor
-
 const PORT = process.env.PORT || 4000;
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
+
+// Función para conectar a MongoDB
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("✅ Conectado con MongoDB");
-    app.listen(PORT, () =>
-      console.log(`Servidor corriendo en el puerto ${PORT}`)
-    );
-  })
-  .catch((err) => console.error("❌ Error al conectar a MongoDB:", err));
+  } catch (err) {
+    console.error("❌ Error al conectar a MongoDB:", err);
+    process.exit(1);
+  }
+};
+
+// Conectar a la base de datos
+connectDB();
+
+// Solo iniciar servidor en desarrollo local
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () =>
+    console.log(`Servidor corriendo en el puerto ${PORT}`)
+  );
+}
+
+// Exportar la app para Vercel
+module.exports = app;
